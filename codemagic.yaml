@@ -7,6 +7,7 @@ workflows:
     scripts:
       - npm install
       - npm install -g eas-cli
+      - eas whoami
       - eas build --platform android --profile preview --non-interactive
     artifacts:
       - build/**/*
