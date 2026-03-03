@@ -2,11 +2,16 @@ workflows:
   expo-android:
     name: Expo Android Build
     max_build_duration: 60
+
     environment:
-      node: latest
+      node: 18
+
     scripts:
       - npm install
       - npm install -g eas-cli
+      - eas login --token $EXPO_TOKEN
+      - eas whoami
       - eas build --platform android --profile preview --non-interactive
+
     artifacts:
       - build/**/*
