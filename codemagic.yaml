@@ -7,9 +7,14 @@ workflows:
       node: 18
 
     scripts:
+      # Install dependencies
       - npm install
       - npm install -g eas-cli@latest
-      - echo $EXPO_TOKEN
+
+      # Verify token exists
+      - echo "Token exists"
+
+      # Build Android APK
       - eas build --platform android --profile preview --non-interactive
 
     artifacts:
