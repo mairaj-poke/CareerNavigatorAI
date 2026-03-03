@@ -8,9 +8,8 @@ workflows:
 
     scripts:
       - npm install
-      - npm install -g eas-cli
-      - eas login --token $EXPO_TOKEN
-      - eas whoami
+      - npm install -g eas-cli@latest
+      - echo $EXPO_TOKEN
       - eas build --platform android --profile preview --non-interactive
 
     artifacts:
