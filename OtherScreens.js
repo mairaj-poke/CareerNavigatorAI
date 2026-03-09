@@ -1,3 +1,6 @@
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage, auth, db } from "../../firebaseConfig";
+import { doc, updateDoc } from "firebase/firestore";
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
@@ -358,36 +361,82 @@ export function SettingsScreen({ user, resumeData, onResumeUpdate, onLogout }) {
   const [uploadDone, setUploadDone] = useState(!!resumeData);
   const [fileName, setFileName] = useState('');
 
-  const pickResume = async () => {
+ const pickResume = async () => {
+  try {
+
+    const result = await DocumentPicker.getDocumentAsync({
+      type: [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain"
+      ],
+      copyToCacheDirectory: true,
+    });
+
+    if (result.canceled) return;
+
+    const file = result.assets[0];
+    setFileName(file.name);
+    setUploading(true);
+
+    // ── Upload file to Firebase Storage ──
+    const response = await fetch(file.uri);
+    const blob = await response.blob();
+
+    const uid = auth.currentUser.uid;
+
+    const storageRef = ref(storage, `resumes/${uid}-${Date.now()}`);
+
+    await uploadBytes(storageRef, blob);
+
+    const downloadURL = await getDownloadURL(storageRef);
+
+    // Save resume URL to Firestore
+    await updateDoc(doc(db, "users", uid), {
+      resumeURL: downloadURL,
+      resumeFileName: file.name,
+      updatedAt: new Date()
+    });
+
+    // ── Extract text for AI analysis ──
+    let text = "";
+
     try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
-        copyToCacheDirectory: true,
+      text = await FileSystem.readAsStringAsync(file.uri, {
+        encoding: FileSystem.EncodingType.UTF8
       });
-      if (result.canceled) return;
-      const file = result.assets[0];
-      setFileName(file.name);
-      setUploading(true);
+    } catch {
+      const b64 = await FileSystem.readAsStringAsync(file.uri, {
+        encoding: FileSystem.EncodingType.Base64
+      });
 
-      let text = '';
-      try {
-        text = await FileSystem.readAsStringAsync(file.uri, { encoding: FileSystem.EncodingType.UTF8 });
-      } catch {
-        const b64 = await FileSystem.readAsStringAsync(file.uri, { encoding: FileSystem.EncodingType.Base64 });
-        text = atob ? atob(b64) : '';
-        text = text.replace(/[^\x20-\x7E\n\r]/g, ' ');
-      }
-      if (text.trim().length < 20) text = `Resume for ${file.name}. Professional seeking opportunities.`;
-
-      const parsed = await analyzeResume(text);
-      onResumeUpdate(parsed, text);
-      setUploadDone(true);
-    } catch (e) {
-      Alert.alert('Upload Failed', 'Could not analyze resume. Please try a text or PDF file.');
-    } finally {
-      setUploading(false);
+      text = atob ? atob(b64) : "";
+      text = text.replace(/[^\x20-\x7E\n\r]/g, " ");
     }
-  };
+
+    if (text.trim().length < 20) {
+      text = `Resume for ${file.name}. Professional seeking opportunities.`;
+    }
+
+    // ── AI Resume Analysis ──
+    const parsed = await analyzeResume(text);
+
+    onResumeUpdate(parsed, text);
+
+    setUploadDone(true);
+
+    Alert.alert("Success", "Resume uploaded and analyzed successfully!");
+
+  } catch (error) {
+
+    console.log("Resume upload error:", error);
+
+    Alert.alert("Upload Failed", "Could not upload or analyze resume.");
+
+  } finally {
+    setUploading(false);
+  }
+};
 
   return (
     <View style={styles.screen}>
