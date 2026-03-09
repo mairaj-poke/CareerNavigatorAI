@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#06060f"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.careernavigator.ai"
@@ -47,8 +49,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "54e2a455-e896-4ed3-a79c-0fd0421bca25"
       }
-    }
+    },
+    "owner": "mairajpoke"
   }
 }
