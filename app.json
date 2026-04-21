@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Career Navigator AI",
+    "slug": "career-navigator-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "career-navigator-ai",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F0F23"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.careernavigator.ai"
+    },
+    "android": {
+      "package": "com.careernavigator.ai"
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
