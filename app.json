@@ -8,34 +8,45 @@
     "scheme": "career-navigator-ai",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+
+    "jsEngine": "hermes",
+
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0F0F23"
     },
+
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.careernavigator.ai"
     },
+
     "android": {
       "package": "com.careernavigator.ai"
     },
+
     "web": {
       "favicon": "./assets/images/icon.png"
     },
+
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-web-browser"
     ],
+
     "experiments": {
       "typedRoutes": true
     },
+
     "extra": {
       "router": {},
       "eas": {
         "projectId": "54e2a455-e896-4ed3-a79c-0fd0421bca25"
-      }
+      },
+
+      "EXPO_PUBLIC_API_BASE_URL": "https://careernavigatorai-production.up.railway.app"
     }
   }
 }

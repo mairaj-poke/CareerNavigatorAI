@@ -1,45 +1,28 @@
-import { Link, Stack } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+const MAX_RETRIES = 2;
 
-import { useColors } from "@/hooks/useColors";
+export async function safeApiCall(url: string, options: RequestInit) {
+  try {
+    for (let i = 0; i <= MAX_RETRIES; i++) {
+      const res = await fetch(url, options);
 
-export default function NotFoundScreen() {
-  const colors = useColors();
+      if (res.ok) return await res.json();
 
-  return (
-    <>
-      <Stack.Screen options={{ title: "Oops!" }} />
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.title, { color: colors.foreground }]}>
-          This screen doesn&apos;t exist.
-        </Text>
+      // ❌ Don't retry client errors
+      if (res.status >= 400 && res.status < 500) {
+        return null;
+      }
 
-        <Link href="/" style={styles.link}>
-          <Text style={[styles.linkText, { color: colors.primary }]}>
-            Go to home screen!
-          </Text>
-        </Link>
-      </View>
-    </>
-  );
+      // ⏳ Retry with backoff
+      if (i < MAX_RETRIES) {
+        await new Promise((r) =>
+          setTimeout(r, 500 * Math.pow(2, i))
+        );
+      }
+    }
+
+    return null;
+  } catch (err) {
+    console.log("API ERROR:", err);
+    return null;
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-  },
-});

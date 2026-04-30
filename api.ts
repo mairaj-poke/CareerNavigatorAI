@@ -5,17 +5,32 @@ export async function fetchWithRetry(
   options: RequestInit,
   retries = MAX_RETRIES,
 ): Promise<Response> {
+  let lastError: unknown;
+
   for (let attempt = 0; attempt <= retries; attempt++) {
-    const res = await fetch(url, options);
-    if (res.ok) return res;
-    // Do not retry client errors (4xx) — they won't change on retry
-    if (res.status >= 400 && res.status < 500) return res;
+    try {
+      const res = await fetch(url, options);
+
+      // success
+      if (res.ok) return res;
+
+      // don't retry client errors
+      if (res.status >= 400 && res.status < 500) return res;
+
+      lastError = new Error(`HTTP ${res.status}`);
+
+    } catch (err) {
+      // network error (THIS is important for Railway / mobile)
+      lastError = err;
+    }
+
+    // retry delay
     if (attempt < retries) {
-      await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 500)); // 500ms, 1000ms
-    } else {
-      return res;
+      await new Promise((r) =>
+        setTimeout(r, Math.pow(2, attempt) * 500)
+      );
     }
   }
-  // Unreachable but satisfies TS
-  return fetch(url, options);
+
+  throw lastError;
 }
