@@ -1,11 +1,17 @@
 export type Plan = "free" | "premium";
 
+export type ResumeEducation = {
+  degree: string;
+  institution?: string;
+  year?: string;
+};
+
 export type ResumeData = {
   skills: string[];
   experience_years: number;
   roles: string[];
   industries: string[];
-  education: string[];
+  education: ResumeEducation[];
   location: string;
 };
 
@@ -19,11 +25,13 @@ export type UserProfile = {
   experience: string;
   skills: string[];
   resumeText: string;
+  resumeFileName: string;
   resumeData?: ResumeData;
-  resumeHash?: string;
+  education: ResumeEducation[];
+  photoUrl: string;
   plan: Plan;
-  analysesUsedToday: number;
-  analysesDate: string; // ISO date string "YYYY-MM-DD"
+  applyMonthKey: string;
+  applyMonthCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -43,9 +51,14 @@ export type Job = {
   tags: string[];
   matchScore: number;
   matchReasons: string[];
-  matchPercentage?: number;
-  matchedSkills?: string[];
-  missingSkills?: string[];
+  isIndia?: boolean;
+};
+
+export type JobFilters = {
+  jobType: string;
+  experience: string;
+  workMode: string;
+  includeInternational: boolean;
 };
 
 export type ApplicationRecord = {
@@ -63,4 +76,5 @@ export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
   createdAt: string;
+  suggestions?: string[];
 };

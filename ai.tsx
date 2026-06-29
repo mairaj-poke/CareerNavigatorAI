@@ -26,9 +26,8 @@ const prompts = [
 ];
 
 const API_BASE =
-  (typeof process !== "undefined" &&
-    process.env?.EXPO_PUBLIC_API_BASE_URL) ||
-  "";
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  "https://careernavigatorai-production.up.railway.app";
 
 export default function AiScreen() {
   const { profile, startAiSession, aiSessionsRemaining, isPremium } = useApp();

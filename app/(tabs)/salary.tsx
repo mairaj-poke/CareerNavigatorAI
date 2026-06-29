@@ -22,8 +22,8 @@ export default function SalaryScreen() {
     const role = (profile?.targetRole || "software developer").toLowerCase();
     const key = Object.keys(ranges).find((item) => role.includes(item)) || "developer";
     const [low, high] = ranges[key];
-    const exp = profile?.experience || "0-2 years";
-    const multiplier = exp.includes("5") || exp.includes("senior") ? 1.45 : exp.includes("3") ? 1.22 : 1;
+    const exp = profile?.experience || "Fresher";
+    const multiplier = exp.includes("10+") ? 2.0 : exp.includes("7") ? 1.7 : exp.includes("4") ? 1.45 : exp.includes("1") ? 1.22 : 1;
     return { low: Math.round(low * multiplier), high: Math.round(high * multiplier), key };
   }, [profile]);
 

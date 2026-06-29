@@ -9,6 +9,8 @@ export type ParsedResume = {
   name: string;
   email: string;
   phone: string;
+  location: string;
+  targetRole: string;
   skills: string[];
   education: ResumeEducation[];
   experience: string;
@@ -53,5 +55,17 @@ export async function parseResumeFile(uri: string, fileName: string, mimeType: s
     const text = await response.text().catch(() => "");
     throw new Error(text ? text.slice(0, 200) : "Resume parsing service is unavailable right now.");
   }
-  return (await response.json()) as ParsedResume;
+  const data = await response.json();
+  return {
+    fileName: data.fileName || fileName || "resume",
+    text: data.text || "",
+    name: data.name || "",
+    email: data.email || "",
+    phone: data.phone || "",
+    location: data.location || "",
+    targetRole: data.targetRole || "",
+    skills: Array.isArray(data.skills) ? data.skills : [],
+    education: Array.isArray(data.education) ? data.education : [],
+    experience: data.experience || "",
+  };
 }
